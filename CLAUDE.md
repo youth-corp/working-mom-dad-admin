@@ -21,10 +21,10 @@
   - `ImprovementTip`, `InspirationQuote`, `PeerInsight`
 - **WeeklyReport / Chat 검수 화면** — 샘플링 + 라벨링.
 
-## 디렉토리 (예정)
+## 디렉토리 (예정, src 없는 형식)
 
 ```
-src/
+.
 ├── app/
 │   ├── (auth)/
 │   ├── content/        # 콘텐츠 CMS
@@ -35,6 +35,8 @@ src/
 ├── lib/
 └── styles/
 ```
+
+> tsconfig paths: `@/*` → `./*` (src 제거 후 루트 기준)
 
 ## 환경 변수
 
