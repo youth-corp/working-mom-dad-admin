@@ -1,7 +1,7 @@
-# working-mom-dad-admin
+# yougabell-admin
 
 > 운영자 CMS. 콘텐츠·사용자·리포트 관리.
-> 워크스페이스 전체 컨벤션은 umbrella 레포 [`working-mom-dad`](https://github.com/youth-corp/working-mom-dad/blob/main/AGENTS.md) 참조.
+> 워크스페이스 전체 컨벤션은 umbrella 레포 [`yougabell`](https://github.com/four-lovely-fairies/yougabell/blob/main/AGENTS.md) 참조.
 > 디자인 시스템·토큰은 [`DESIGN.md`](./DESIGN.md) 참조 (Figma MCP 연결 후 채워짐).
 
 ## 빌드 · 실행 · 검증 명령
@@ -25,7 +25,7 @@ pnpm lint         # eslint
 ## 핵심 원칙
 
 - **운영자 전용**: 별도 도메인(`admin.youth.kr` 검토). Supabase Auth + role 게이트.
-- **API 호출**: `working-mom-dad-api` OpenAPI 코드젠 클라이언트.
+- **API 호출**: `yougabell-api` OpenAPI 코드젠 클라이언트.
 - **개인정보**: 사용자 정보 표시 시 마스킹 / 감사 로그.
 - **컨텐츠 운영 대상**:
   - `Mission`, `MentalCareContent`, `Milestone`, `MilestoneCategory`

@@ -1,4 +1,4 @@
-# Design System — working-mom-dad-admin
+# Design System — yougabell-admin
 
 > 운영자 CMS의 디자인 시스템 컨텍스트. AI 코딩 에이전트가 UI 코드를 생성할 때 참고.
 > **현재 placeholder** — 운영자 화면은 와이어프레임에 미노출이라 디자인 결정 후 갱신.
@@ -24,7 +24,7 @@
 | 리포트 검수 | `app/reports/` | `WeeklyReport` (샘플링) |
 | 챗 검수 | `app/chats/` | `ChatSession`, `ChatMessage` (라벨링) |
 
-> 모든 화면은 [`docs/schema/`](https://github.com/youth-corp/working-mom-dad-api/tree/main/docs/schema) 도메인 모델과 1:1 매칭.
+> 모든 화면은 [`docs/schema/`](https://github.com/four-lovely-fairies/yougabell-api/tree/main/docs/schema) 도메인 모델과 1:1 매칭.
 
 ---
 
