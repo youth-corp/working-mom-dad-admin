@@ -49,7 +49,7 @@
 | 리포트 검수 | `app/reports/`                                                                               | `WeeklyReport` (샘플링)                                                                                               |
 | 챗 검수     | `app/chats/`                                                                                 | `ChatSession`, `ChatMessage` (라벨링)                                                                                 |
 
-> 모든 화면은 [`docs/schema/`](https://github.com/four-lovely-fairies/yougabell-api/tree/main/docs/schema) 도메인 모델과 1:1 매칭.
+> 모든 화면은 [`docs/schema/`](https://github.com/four-lovely-fairies/yougabell/tree/main/docs/schema) 도메인 모델과 1:1 매칭.
 
 ---
 
