@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   Lightbulb,
   MessageSquare,
+  Milestone,
   Sparkles,
   Users,
 } from "lucide-react";
@@ -37,6 +38,7 @@ const contentItems = [
   { href: "/content/missions", label: "미션", icon: ClipboardList },
   { href: "/content/care", label: "마음 케어", icon: Heart },
   { href: "/content/milestones", label: "발달 마일스톤", icon: Baby },
+  { href: "/content/growth-stages", label: "성장 단계", icon: Milestone },
   { href: "/content/tips", label: "팁·인용구", icon: Lightbulb },
 ];
 

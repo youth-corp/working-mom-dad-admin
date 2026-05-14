@@ -1,15 +1,24 @@
-import { PageStub } from "@/components/page-stub";
+import { MilestonesTable } from "@/components/milestones/milestones-table";
+import { adminApi } from "@/lib/api";
 
-export default function MilestonesPage() {
+export default async function MilestonesPage() {
+  const [list, categories] = await Promise.all([
+    adminApi.milestones.list({ page: 1, pageSize: 100 }),
+    adminApi.categories.list(),
+  ]);
   return (
-    <PageStub
-      crumbs={[
-        { label: "콘텐츠", href: "/content/milestones" },
-        { label: "발달 마일스톤" },
-      ]}
-      title="발달 마일스톤"
-      description="Milestone 운영 — 월령별 발달 지표·카테고리."
-      fields={["id", "ageMonths", "category", "title", "description"]}
-    />
+    <div className="flex flex-col gap-6 p-6">
+      <header>
+        <h1 className="text-2xl font-semibold">발달 마일스톤</h1>
+        <p className="text-muted-foreground text-sm">
+          월령별 발달 내용. AI 추천·홈 화면 카드의 소스 데이터.
+        </p>
+      </header>
+      <MilestonesTable
+        items={list.items}
+        categories={categories}
+        total={list.total}
+      />
+    </div>
   );
 }
