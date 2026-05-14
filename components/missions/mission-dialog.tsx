@@ -31,11 +31,14 @@ type FormValues = {
   durationMinutes: number;
   effect: string;
   subThemeLabel?: string;
+  goal?: string;
   recommendedAgeMonthsMin?: number | "";
   recommendedAgeMonthsMax?: number | "";
   thumbnailUrl?: string;
   videoUrl?: string;
   tagsInput?: string; // 쉼표로 분리해 입력
+  sourceCitation?: string; // CSV 단일 출처 패턴 (CDC, Tomasello 1995 등)
+  sourceUrl?: string;
 };
 
 type Props = {
@@ -73,11 +76,14 @@ export function MissionDialog({ categories, mission, trigger }: Props) {
           durationMinutes: mission.durationMinutes,
           effect: mission.effect,
           subThemeLabel: mission.subThemeLabel ?? "",
+          goal: mission.goal ?? "",
           recommendedAgeMonthsMin: mission.recommendedAgeMonthsMin ?? "",
           recommendedAgeMonthsMax: mission.recommendedAgeMonthsMax ?? "",
           thumbnailUrl: mission.thumbnailUrl ?? "",
           videoUrl: mission.videoUrl ?? "",
           tagsInput: mission.tags.join(", "),
+          sourceCitation: mission.sources[0]?.citation ?? "",
+          sourceUrl: mission.sources[0]?.url ?? "",
         }
       : {
           categoryId: "",
@@ -87,11 +93,14 @@ export function MissionDialog({ categories, mission, trigger }: Props) {
           durationMinutes: 10,
           effect: "",
           subThemeLabel: "",
+          goal: "",
           recommendedAgeMonthsMin: "",
           recommendedAgeMonthsMax: "",
           thumbnailUrl: "",
           videoUrl: "",
           tagsInput: "",
+          sourceCitation: "",
+          sourceUrl: "",
         },
   });
 
@@ -99,6 +108,11 @@ export function MissionDialog({ categories, mission, trigger }: Props) {
     const optNum = (v?: number | "") =>
       v === "" || v === undefined ? undefined : Number(v);
     const optStr = (v?: string) => (v?.trim() ? v.trim() : undefined);
+    const citation = values.sourceCitation?.trim();
+    const sourceUrl = values.sourceUrl?.trim();
+    const sources = citation
+      ? [{ citation, ...(sourceUrl ? { url: sourceUrl } : {}) }]
+      : [];
     const body = {
       categoryId: values.categoryId,
       title: values.title.trim(),
@@ -107,11 +121,13 @@ export function MissionDialog({ categories, mission, trigger }: Props) {
       durationMinutes: Number(values.durationMinutes),
       effect: values.effect.trim(),
       subThemeLabel: optStr(values.subThemeLabel),
+      goal: optStr(values.goal),
       recommendedAgeMonthsMin: optNum(values.recommendedAgeMonthsMin),
       recommendedAgeMonthsMax: optNum(values.recommendedAgeMonthsMax),
       thumbnailUrl: optStr(values.thumbnailUrl),
       videoUrl: optStr(values.videoUrl),
       tags: splitTags(values.tagsInput),
+      sources,
     };
     try {
       if (isEdit && mission) {
@@ -228,6 +244,18 @@ export function MissionDialog({ categories, mission, trigger }: Props) {
           </div>
 
           <div className="grid gap-2">
+            <Label>마일스톤 목표 (선택)</Label>
+            <Input
+              placeholder="예: 또래와 함께 놀이하는 초기 사회성"
+              {...register("goal")}
+            />
+            <p className="text-muted-foreground text-xs">
+              해당 미션이 달성하려는 발달 마일스톤 (CSV "아이 나잇대별 마일스톤
+              목표" 컬럼).
+            </p>
+          </div>
+
+          <div className="grid gap-2">
             <Label>권장 월령 범위 (선택)</Label>
             <div className="flex items-center gap-2">
               <Input
@@ -269,6 +297,21 @@ export function MissionDialog({ categories, mission, trigger }: Props) {
             />
             <p className="text-muted-foreground text-xs">
               예: <code>감정, 말놀이</code> → 자동 trim·중복 제거.
+            </p>
+          </div>
+
+          <div className="grid gap-2">
+            <Label>자료 출처 (선택)</Label>
+            <Input
+              placeholder="예: CDC. (2023). Developmental Milestones: 12 Months."
+              {...register("sourceCitation")}
+            />
+            <Input
+              placeholder="출처 URL (선택)"
+              {...register("sourceUrl")}
+            />
+            <p className="text-muted-foreground text-xs">
+              한 미션당 출처 1건. 여러 출처는 추후 별도 UI에서.
             </p>
           </div>
 

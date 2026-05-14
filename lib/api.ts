@@ -147,6 +147,12 @@ export type CreateGrowthStageBody = {
 
 export type UpdateGrowthStageBody = Omit<Partial<CreateGrowthStageBody>, "id">;
 
+export type MissionSource = {
+  citation: string;
+  url: string | null;
+  note: string | null;
+};
+
 export type Mission = {
   id: string;
   categoryId: string;
@@ -156,11 +162,13 @@ export type Mission = {
   durationMinutes: number;
   effect: string;
   subThemeLabel: string | null;
+  goal: string | null;
   recommendedAgeMonthsMin: number | null;
   recommendedAgeMonthsMax: number | null;
   thumbnailUrl: string | null;
   videoUrl: string | null;
   tags: string[];
+  sources: MissionSource[];
   createdAt: string;
   updatedAt: string;
 };
@@ -173,11 +181,13 @@ export type CreateMissionBody = {
   durationMinutes: number;
   effect: string;
   subThemeLabel?: string;
+  goal?: string;
   recommendedAgeMonthsMin?: number;
   recommendedAgeMonthsMax?: number;
   thumbnailUrl?: string;
   videoUrl?: string;
   tags?: string[];
+  sources?: { citation: string; url?: string; note?: string }[];
 };
 
 export type UpdateMissionBody = Partial<CreateMissionBody>;
