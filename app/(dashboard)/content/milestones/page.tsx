@@ -3,7 +3,7 @@ import { adminApi } from "@/lib/api";
 
 export default async function MilestonesPage() {
   const [list, categories] = await Promise.all([
-    adminApi.milestones.list({ page: 1, pageSize: 100 }),
+    adminApi.milestones.list({ page: 1, pageSize: 500 }),
     adminApi.categories.list(),
   ]);
   return (

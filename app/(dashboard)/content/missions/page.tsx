@@ -3,7 +3,7 @@ import { adminApi } from "@/lib/api";
 
 export default async function MissionsPage() {
   const [list, categories] = await Promise.all([
-    adminApi.missions.list({ page: 1, pageSize: 100 }),
+    adminApi.missions.list({ page: 1, pageSize: 500 }),
     adminApi.categories.list(),
   ]);
   return (
