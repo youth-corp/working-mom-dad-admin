@@ -1,6 +1,6 @@
 "use client";
 
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -13,11 +13,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DeleteConfirmDialog } from "@/components/shared/delete-confirm-dialog";
+import { EditableAgeRangeCell } from "@/components/shared/editable-age-range-cell";
+import { EditableNumberCell } from "@/components/shared/editable-number-cell";
+import { EditableSelectCell } from "@/components/shared/editable-select-cell";
+import { EditableTextCell } from "@/components/shared/editable-text-cell";
 import { MilestoneDialog } from "./milestone-dialog";
 import {
   adminApi,
   type Milestone,
   type MilestoneCategory,
+  type UpdateMilestoneBody,
 } from "@/lib/api";
 
 type Props = {
@@ -28,8 +33,21 @@ type Props = {
 
 export function MilestonesTable({ items, categories, total }: Props) {
   const router = useRouter();
-  const labelOf = (id: string) =>
-    categories.find((c) => c.id === id)?.label ?? id;
+  const categoryOptions = categories.map((c) => ({
+    value: c.id,
+    label: c.label,
+  }));
+
+  async function patch(id: string, body: UpdateMilestoneBody) {
+    try {
+      await adminApi.milestones.update(id, body);
+      router.refresh();
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "저장 실패";
+      toast.error(message);
+      throw e;
+    }
+  }
 
   async function onDelete(id: string) {
     try {
@@ -45,7 +63,9 @@ export function MilestonesTable({ items, categories, total }: Props) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <span className="text-muted-foreground text-sm">총 {total}건</span>
+        <span className="text-muted-foreground text-sm">
+          총 {total}건 · 셀을 클릭해 바로 편집
+        </span>
         <MilestoneDialog
           categories={categories}
           trigger={
@@ -60,47 +80,71 @@ export function MilestonesTable({ items, categories, total }: Props) {
           <TableHeader>
             <TableRow>
               <TableHead className="w-32">카테고리</TableHead>
-              <TableHead className="w-28">월령</TableHead>
+              <TableHead className="w-32">월령</TableHead>
               <TableHead className="w-48">제목</TableHead>
               <TableHead>설명</TableHead>
-              <TableHead className="w-16">정렬</TableHead>
-              <TableHead className="w-28 text-right">액션</TableHead>
+              <TableHead className="w-20">정렬</TableHead>
+              <TableHead className="w-12 text-right" />
             </TableRow>
           </TableHeader>
           <TableBody>
             {items.map((m) => (
-              <TableRow key={m.id}>
-                <TableCell>{labelOf(m.categoryId)}</TableCell>
-                <TableCell>
-                  {m.ageMonthsFrom}~{m.ageMonthsTo}개월
+              <TableRow key={m.id} className="align-top">
+                <TableCell className="p-1">
+                  <EditableSelectCell
+                    value={m.categoryId}
+                    options={categoryOptions}
+                    onSave={(next) => patch(m.id, { categoryId: next })}
+                  />
                 </TableCell>
-                <TableCell>{m.title ?? "-"}</TableCell>
-                <TableCell className="max-w-md truncate text-muted-foreground">
-                  {m.description}
+                <TableCell className="p-1">
+                  <EditableAgeRangeCell
+                    from={m.ageMonthsFrom}
+                    to={m.ageMonthsTo}
+                    onSave={({ from, to }) =>
+                      patch(m.id, {
+                        ageMonthsFrom: from,
+                        ageMonthsTo: to,
+                      })
+                    }
+                  />
                 </TableCell>
-                <TableCell>{m.displayOrder ?? "-"}</TableCell>
+                <TableCell className="p-1">
+                  <EditableTextCell
+                    value={m.title}
+                    onSave={(next) =>
+                      patch(m.id, { title: next ?? undefined })
+                    }
+                  />
+                </TableCell>
+                <TableCell className="p-1">
+                  <EditableTextCell
+                    value={m.description}
+                    multiline
+                    onSave={(next) =>
+                      patch(m.id, { description: next ?? "" })
+                    }
+                  />
+                </TableCell>
+                <TableCell className="p-1">
+                  <EditableNumberCell
+                    value={m.displayOrder}
+                    onSave={(next) =>
+                      patch(m.id, { displayOrder: next ?? undefined })
+                    }
+                  />
+                </TableCell>
                 <TableCell className="text-right">
-                  <div className="flex justify-end gap-1">
-                    <MilestoneDialog
-                      categories={categories}
-                      milestone={m}
-                      trigger={
-                        <Button variant="ghost" size="icon" aria-label="편집">
-                          <Pencil className="size-4" />
-                        </Button>
-                      }
-                    />
-                    <DeleteConfirmDialog
-                      onConfirm={() => onDelete(m.id)}
-                      title={`'${m.title ?? labelOf(m.categoryId)}' 삭제`}
-                      description={`${m.ageMonthsFrom}~${m.ageMonthsTo}개월 마일스톤을 삭제합니다. 출처(Source) 데이터도 함께 삭제됩니다.`}
-                      trigger={
-                        <Button variant="ghost" size="icon" aria-label="삭제">
-                          <Trash2 className="size-4" />
-                        </Button>
-                      }
-                    />
-                  </div>
+                  <DeleteConfirmDialog
+                    onConfirm={() => onDelete(m.id)}
+                    title="마일스톤 삭제"
+                    description={`${m.ageMonthsFrom}~${m.ageMonthsTo}개월 마일스톤. 출처(Source)도 함께 삭제됩니다.`}
+                    trigger={
+                      <Button variant="ghost" size="icon" aria-label="삭제">
+                        <Trash2 className="size-4" />
+                      </Button>
+                    }
+                  />
                 </TableCell>
               </TableRow>
             ))}
