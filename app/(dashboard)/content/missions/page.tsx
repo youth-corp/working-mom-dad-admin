@@ -1,6 +1,8 @@
 import { MissionsTable } from "@/components/missions/missions-table";
 import { adminApi } from "@/lib/api";
 
+export const dynamic = "force-dynamic";
+
 export default async function MissionsPage() {
   const [list, categories] = await Promise.all([
     adminApi.missions.list({ take: 50 }),
