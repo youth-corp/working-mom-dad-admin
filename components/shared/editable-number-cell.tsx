@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -24,9 +24,10 @@ export function EditableNumberCell({
   const [draft, setDraft] = useState(value?.toString() ?? "");
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
+  const enterEdit = () => {
     setDraft(value?.toString() ?? "");
-  }, [value]);
+    setEditing(true);
+  };
 
   const commit = async () => {
     if (busy) return;
@@ -82,7 +83,7 @@ export function EditableNumberCell({
   return (
     <button
       type="button"
-      onClick={() => setEditing(true)}
+      onClick={enterEdit}
       className={cn(
         "w-full text-left px-2 py-1 rounded-sm hover:bg-muted/50 text-sm",
         value === null && "text-muted-foreground",
