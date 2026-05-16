@@ -1,11 +1,8 @@
 import { MissionsTable } from "@/components/missions/missions-table";
+import { ApiUnreachable } from "@/components/shared/api-unreachable";
 import { adminApi } from "@/lib/api";
 
 export default async function MissionsPage() {
-  const [list, categories] = await Promise.all([
-    adminApi.missions.list({ page: 1, pageSize: 500 }),
-    adminApi.categories.list(),
-  ]);
   return (
     <div className="flex flex-col gap-6 p-6">
       <header>
@@ -15,11 +12,25 @@ export default async function MissionsPage() {
           분류된다.
         </p>
       </header>
+      <MissionsContent />
+    </div>
+  );
+}
+
+async function MissionsContent() {
+  try {
+    const [list, categories] = await Promise.all([
+      adminApi.missions.list({ page: 1, pageSize: 500 }),
+      adminApi.categories.list(),
+    ]);
+    return (
       <MissionsTable
         items={list.items}
         categories={categories}
         total={list.total}
       />
-    </div>
-  );
+    );
+  } catch (e) {
+    return <ApiUnreachable error={e} resource="미션" />;
+  }
 }

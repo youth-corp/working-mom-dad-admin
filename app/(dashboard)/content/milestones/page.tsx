@@ -1,11 +1,8 @@
 import { MilestonesTable } from "@/components/milestones/milestones-table";
+import { ApiUnreachable } from "@/components/shared/api-unreachable";
 import { adminApi } from "@/lib/api";
 
 export default async function MilestonesPage() {
-  const [list, categories] = await Promise.all([
-    adminApi.milestones.list({ page: 1, pageSize: 500 }),
-    adminApi.categories.list(),
-  ]);
   return (
     <div className="flex flex-col gap-6 p-6">
       <header>
@@ -14,11 +11,25 @@ export default async function MilestonesPage() {
           월령별 발달 내용. AI 추천·홈 화면 카드의 소스 데이터.
         </p>
       </header>
+      <MilestonesContent />
+    </div>
+  );
+}
+
+async function MilestonesContent() {
+  try {
+    const [list, categories] = await Promise.all([
+      adminApi.milestones.list({ page: 1, pageSize: 500 }),
+      adminApi.categories.list(),
+    ]);
+    return (
       <MilestonesTable
         items={list.items}
         categories={categories}
         total={list.total}
       />
-    </div>
-  );
+    );
+  } catch (e) {
+    return <ApiUnreachable error={e} resource="마일스톤" />;
+  }
 }

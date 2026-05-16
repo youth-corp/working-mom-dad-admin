@@ -69,15 +69,25 @@ async function adminRequest<T>(
   init?: RequestInit & { json?: unknown },
 ): Promise<T> {
   const { json, headers, ...rest } = init ?? {};
-  const res = await fetch(`${BASE_URL}${path}`, {
-    ...rest,
-    headers: {
-      "Content-Type": "application/json",
-      ...(headers as Record<string, string> | undefined),
-    },
-    body: json !== undefined ? JSON.stringify(json) : undefined,
-    cache: "no-store",
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${BASE_URL}${path}`, {
+      ...rest,
+      headers: {
+        "Content-Type": "application/json",
+        ...(headers as Record<string, string> | undefined),
+      },
+      body: json !== undefined ? JSON.stringify(json) : undefined,
+      cache: "no-store",
+    });
+  } catch (e) {
+    // API 미배포·네트워크 실패 — 명시적 0 status로 변환 (SSR 500 방지용 폴백 신호)
+    throw new AdminApiError(0, {
+      message: "API unreachable",
+      error: e instanceof Error ? e.message : String(e),
+      base: BASE_URL,
+    });
+  }
   if (res.status === 204) return undefined as T;
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new AdminApiError(res.status, body);
