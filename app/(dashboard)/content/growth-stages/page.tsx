@@ -1,8 +1,8 @@
 import { GrowthStagesTable } from "@/components/growth-stages/growth-stages-table";
-import { ApiUnreachable } from "@/components/shared/api-unreachable";
 import { adminApi } from "@/lib/api";
 
 export default async function GrowthStagesPage() {
+  const items = await adminApi.growthStages.list();
   return (
     <div className="flex flex-col gap-6 p-6">
       <header>
@@ -11,16 +11,7 @@ export default async function GrowthStagesPage() {
           큰 발달 단계 (자아 형성기 등). 마일스톤과는 별개의 슬러그 PK.
         </p>
       </header>
-      <GrowthStagesContent />
+      <GrowthStagesTable items={items} />
     </div>
   );
-}
-
-async function GrowthStagesContent() {
-  try {
-    const items = await adminApi.growthStages.list();
-    return <GrowthStagesTable items={items} />;
-  } catch (e) {
-    return <ApiUnreachable error={e} resource="성장 단계" />;
-  }
 }
