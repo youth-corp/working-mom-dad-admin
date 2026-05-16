@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -30,9 +30,11 @@ export function EditableTextCell({
   const [busy, setBusy] = useState(false);
   const ref = useRef<HTMLTextAreaElement | HTMLInputElement | null>(null);
 
-  useEffect(() => {
+  // 편집 시작 시 latest value로 draft 초기화 — useEffect로 sync하면 사용자 입력을 덮어쓸 위험.
+  const enterEdit = () => {
     setDraft(value ?? "");
-  }, [value]);
+    setEditing(true);
+  };
 
   const commit = async () => {
     if (busy) return;
@@ -98,7 +100,7 @@ export function EditableTextCell({
   return (
     <button
       type="button"
-      onClick={() => setEditing(true)}
+      onClick={enterEdit}
       className={cn(
         "w-full text-left px-2 py-1 rounded-sm hover:bg-muted/50 focus:outline-2 focus:outline-primary text-sm",
         !value && "text-muted-foreground",

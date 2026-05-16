@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
@@ -35,9 +35,10 @@ export function EditableTagsCell({
   const [draft, setDraft] = useState(joinTags(value));
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
+  const enterEdit = () => {
     setDraft(joinTags(value));
-  }, [value]);
+    setEditing(true);
+  };
 
   const commit = async () => {
     if (busy) return;
@@ -87,7 +88,7 @@ export function EditableTagsCell({
   return (
     <button
       type="button"
-      onClick={() => setEditing(true)}
+      onClick={enterEdit}
       className={cn(
         "w-full text-left px-2 py-1 rounded-sm hover:bg-muted/50 flex flex-wrap gap-1 min-h-[2rem]",
         className,

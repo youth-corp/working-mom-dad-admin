@@ -1,6 +1,7 @@
 "use client";
 
 import { Plus, Trash2 } from "lucide-react";
+import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ import { EditableAgeRangeCell } from "@/components/shared/editable-age-range-cel
 import { EditableNumberCell } from "@/components/shared/editable-number-cell";
 import { EditableSelectCell } from "@/components/shared/editable-select-cell";
 import { EditableTextCell } from "@/components/shared/editable-text-cell";
+import { useInfiniteCursor } from "@/hooks/use-infinite-cursor";
 import { MilestoneDialog } from "./milestone-dialog";
 import {
   adminApi,
@@ -25,13 +27,29 @@ import {
   type UpdateMilestoneBody,
 } from "@/lib/api";
 
+const PAGE_SIZE = 50;
+
 type Props = {
-  items: Milestone[];
+  initialItems: Milestone[];
+  initialCursor: string | null;
   categories: MilestoneCategory[];
-  total: number;
 };
 
-export function MilestonesTable({ items, categories, total }: Props) {
+export function MilestonesTable({
+  initialItems,
+  initialCursor,
+  categories,
+}: Props) {
+  const fetchMore = useCallback(
+    (cursor: string) =>
+      adminApi.milestones.list({ cursor, take: PAGE_SIZE }),
+    [],
+  );
+  const { items, hasMore, loading, triggerRef } = useInfiniteCursor(
+    initialItems,
+    initialCursor,
+    fetchMore,
+  );
   const router = useRouter();
   const categoryOptions = categories.map((c) => ({
     value: c.id,
@@ -64,7 +82,7 @@ export function MilestonesTable({ items, categories, total }: Props) {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <span className="text-muted-foreground text-sm">
-          총 {total}건 · 셀을 클릭해 바로 편집
+          {items.length}건 로드됨{hasMore ? " (스크롤하면 더 불러옵니다)" : " · 전체"} · 셀 클릭으로 편집
         </span>
         <MilestoneDialog
           categories={categories}
@@ -161,6 +179,14 @@ export function MilestonesTable({ items, categories, total }: Props) {
           </TableBody>
         </Table>
       </div>
+      {hasMore && (
+        <div
+          ref={triggerRef}
+          className="text-muted-foreground py-4 text-center text-xs"
+        >
+          {loading ? "불러오는 중..." : "스크롤하면 더 보여집니다"}
+        </div>
+      )}
     </div>
   );
 }

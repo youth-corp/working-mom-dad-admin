@@ -128,15 +128,13 @@ export type UpdateMilestoneBody = Partial<CreateMilestoneBody>;
 export type MilestoneListQuery = {
   categoryId?: string;
   ageMonths?: number;
-  page?: number;
-  pageSize?: number;
+  cursor?: string;
+  take?: number;
 };
 
-export type Paginated<T> = {
+export type CursorPage<T> = {
   items: T[];
-  total: number;
-  page: number;
-  pageSize: number;
+  nextCursor: string | null;
 };
 
 export type GrowthStage = {
@@ -205,8 +203,8 @@ export type UpdateMissionBody = Partial<CreateMissionBody>;
 export type MissionListQuery = {
   categoryId?: string;
   ageMonths?: number;
-  page?: number;
-  pageSize?: number;
+  cursor?: string;
+  take?: number;
 };
 
 function buildSearch(record: Record<string, string | number | undefined>) {
@@ -225,7 +223,7 @@ export const adminApi = {
   },
   milestones: {
     list: (q: MilestoneListQuery = {}) =>
-      adminRequest<Paginated<Milestone>>(`/admin/milestones${buildSearch(q)}`),
+      adminRequest<CursorPage<Milestone>>(`/admin/milestones${buildSearch(q)}`),
     create: (body: CreateMilestoneBody) =>
       adminRequest<Milestone>("/admin/milestones", {
         method: "POST",
@@ -256,7 +254,7 @@ export const adminApi = {
   },
   missions: {
     list: (q: MissionListQuery = {}) =>
-      adminRequest<Paginated<Mission>>(`/admin/missions${buildSearch(q)}`),
+      adminRequest<CursorPage<Mission>>(`/admin/missions${buildSearch(q)}`),
     create: (body: CreateMissionBody) =>
       adminRequest<Mission>("/admin/missions", { method: "POST", json: body }),
     update: (id: string, body: UpdateMissionBody) =>
