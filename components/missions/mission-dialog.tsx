@@ -250,8 +250,8 @@ export function MissionDialog({ categories, mission, trigger }: Props) {
               {...register("goal")}
             />
             <p className="text-muted-foreground text-xs">
-              해당 미션이 달성하려는 발달 마일스톤 (CSV "아이 나잇대별 마일스톤
-              목표" 컬럼).
+              해당 미션이 달성하려는 발달 마일스톤 (CSV &ldquo;아이 나잇대별
+              마일스톤 목표&rdquo; 컬럼).
             </p>
           </div>
 
