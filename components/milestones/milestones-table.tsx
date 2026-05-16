@@ -45,11 +45,8 @@ export function MilestonesTable({
       adminApi.milestones.list({ cursor, take: PAGE_SIZE }),
     [],
   );
-  const { items, hasMore, loading, triggerRef } = useInfiniteCursor(
-    initialItems,
-    initialCursor,
-    fetchMore,
-  );
+  const { items, hasMore, loading, error, retry, triggerRef } =
+    useInfiniteCursor(initialItems, initialCursor, fetchMore);
   const router = useRouter();
   const categoryOptions = categories.map((c) => ({
     value: c.id,
@@ -179,12 +176,22 @@ export function MilestonesTable({
           </TableBody>
         </Table>
       </div>
-      {hasMore && (
+      {hasMore && !error && (
         <div
           ref={triggerRef}
           className="text-muted-foreground py-4 text-center text-xs"
         >
           {loading ? "불러오는 중..." : "스크롤하면 더 보여집니다"}
+        </div>
+      )}
+      {error && (
+        <div className="flex flex-col items-center gap-2 py-4">
+          <p className="text-destructive text-xs">
+            추가 로딩 실패: {error instanceof Error ? error.message : "알 수 없는 오류"}
+          </p>
+          <Button variant="outline" size="sm" onClick={retry}>
+            재시도
+          </Button>
         </div>
       )}
     </div>
