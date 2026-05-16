@@ -11,6 +11,7 @@ type FetchPage<T> = (cursor: string) => Promise<{
  * 커서 기반 무한 스크롤 hook.
  * - 첫 페이지(initialItems + initialCursor)는 SSR로 받음
  * - `triggerRef`를 sentinel 요소에 부착 → 뷰포트 진입 시 다음 페이지 자동 로드
+ * - error 발생 시 observer 비활성 → 무한 retry 차단. 재시도는 `retry()`로 명시 호출.
  * - SSR refresh(부모 router.refresh)로 새 initial props가 들어오면 누적 state도 reset
  *   — render-time conditional setState 패턴 (useEffect set-state 안티패턴 회피)
  */
@@ -26,7 +27,7 @@ export function useInfiniteCursor<T>(
   const [items, setItems] = useState(initialItems);
   const [cursor, setCursor] = useState(initialCursor);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<unknown>(null);
+  const [error, setError] = useState<Error | null>(null);
   const triggerRef = useRef<HTMLDivElement | null>(null);
 
   if (
@@ -48,7 +49,7 @@ export function useInfiniteCursor<T>(
       setItems((prev) => [...prev, ...res.items]);
       setCursor(res.nextCursor);
     } catch (e) {
-      setError(e);
+      setError(e instanceof Error ? e : new Error(String(e)));
     } finally {
       setLoading(false);
     }
@@ -56,7 +57,8 @@ export function useInfiniteCursor<T>(
 
   useEffect(() => {
     const el = triggerRef.current;
-    if (!el || !cursor) return;
+    // error가 발생하면 observer 비활성 → 무한 retry 차단. retry는 명시 호출로.
+    if (!el || !cursor || error) return;
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0]?.isIntersecting) void loadMore();
@@ -65,7 +67,12 @@ export function useInfiniteCursor<T>(
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [cursor, loadMore]);
+  }, [cursor, loadMore, error]);
+
+  const retry = useCallback(() => {
+    setError(null);
+    void loadMore();
+  }, [loadMore]);
 
   return {
     items,
@@ -74,6 +81,7 @@ export function useInfiniteCursor<T>(
     loading,
     error,
     loadMore,
+    retry,
     triggerRef,
   };
 }
